@@ -26,7 +26,7 @@ r = 1*ones(steps, 1);           % reference signal
 
 %% Plot (black background)
 % Create figure with black background
-figure('Color', [0.2 0.2 0.2]);
+figure('Color', 'k');
 
 % First subplot: Position
 ax1 = subplot(2,1,1);
@@ -36,7 +36,8 @@ hold on;
 stairs(t, r(:,1), 'c--', 'LineWidth', 2); % Setpoint in red dashed
 hold off;
 
-legend('Feedback', 'Setpoint', 'TextColor', 'w', 'Color', 'k', 'EdgeColor', [0.5 0.5 0.5], 'LineWidth', 1, 'FontSize', 12); % Legend text in white
+legend('Feedback', 'Setpoint', 'TextColor', 'w', 'Color', 'k', 'EdgeColor', ...
+    [0.5 0.5 0.5], 'LineWidth', 1, 'FontSize', 12); % Legend text in white
 ylabel('Position (m)', 'Color', 'w', 'FontSize', 12); % Y-axis label in white
 title('Position', 'Color', 'w', 'FontSize', 12); % Title in white
 grid on;
