@@ -29,9 +29,9 @@ Where:
 - $u = F$
 
 Matrices:
-- $$A = \begin{bmatrix} -k/m & 0 \\ 1 & 0 \end{bmatrix} = \begin{bmatrix} -0.05 & 0 \\ 1 & 0 \end{bmatrix}$$
-- $B = \begin{bmatrix} 1/m \\ 0 \end{bmatrix} = \begin{bmatrix} 0.1 \\ 0 \end{bmatrix}$
-- $C = \begin{bmatrix} 0 & 1 \end{bmatrix}$
+- $A = \left[ -k/m ~~ 0; ~~ 1 ~~ 0 \right]$
+- $B = \left[ 1/m ; ~~ 0 \right]$
+- $C = \left[ 0 ~~ 1 \right]$
 - $D = 0$
 
 ## MPC Tuning & Implementation
@@ -46,10 +46,10 @@ The linear MPC controller was configured in MATLAB with the following specificat
   - Manipulated Variable: 0
   - Manipulated Variable Rate of Change: 0.1
 - **Constraints**:
-  - Output Variable: $[-2, 2]\, m$
-  - Manipulated Variable: $[-10, 10]\, N$
+  - Output Variable: $[-2, 2] ~ m$
+  - Manipulated Variable: $[-10, 10] ~ N$
 - **MPC Parameters**:
-  - Sample Time: $0.1\, s$
+  - Sample Time: $0.1 ~ s$
   - Prediction Horizon: 10
   - Control Horizon: 2
 
