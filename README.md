@@ -60,6 +60,24 @@ The linear MPC controller was configured in MATLAB with the following specificat
 ## Simulation Results
 The MPC algorithm achieved smooth position control with minimal overshoot. Since the same model was used for both the controller design and validation, the system performance was nearly ideal. Future improvements could include robustness testing and disturbance rejection analysis.
 
+## Explore Different Constraints
+
+The previous simulation was performed with the manipulated variable ($F$) limited between -10 N and 10 N.
+
+Now we want to explore more combinations of constraints to see how the MPC algorithm handles constraints and how they affect the response.
+
+We will choose:
+
+- [-5 N, 5 N]
+- [-10 N, 10 N]
+- [-20 N, 20 N]
+
+### Simulation Result - Different Constraints
+
+The simulation is performed directly in MATLAB using the command `sim`, for 6 seconds, on the nominal system, with the 3 different combinations of constraints listed above.
+
+As expected, as the control input range is reduced, the control performance is degraded. Still, the MPC always finds the optimal solution by "knowing" the limits and the system's response in advance.
+
 ## Author
 This project is developed by Simone Bertoni. Learn more about my work on my personal website - [Simone Bertoni - Control Lab](https://simonebertonilab.com/).
 
