@@ -143,3 +143,95 @@ ax2.GridColor = 'w';
 ax2.GridAlpha = 0.3;
 ax2.XColor = 'w';
 ax2.YColor = 'w';
+
+%% Simulate with various constraints on position
+
+% Define simulation parameters
+Tsim = 6;                        % Total simulation time in seconds
+steps = round(Tsim / Ts);        % Number of simulation steps
+r = ones(steps, 1);              % Reference signal
+
+% Define different OV constraint scenarios
+ov_constraints = [
+    1.15, -1.15;
+    1.05, -1.05;
+    1.02, -1.02
+    ];
+
+t_constraint = [0 Tsim];
+
+% Define colors for plotting
+colors = {'m', 'c', 'g'};        % Colors for different responses
+colors_constraints = {'b', 'y', 'w'};        % Colors for different constraints
+labels = {'Response with 1.15 m Constraint', 'Response with 1.05 m Constraint', 'Response with 1.02 m Constraint'};  % Labels for legend (response)
+labels_constraints = {'1.15 m Constraint', '1.05 m Constraint', '1.02 m Constraint'};  % Labels for legend (constraint)
+
+% Initialize cell arrays to store simulation results
+y_all = cell(1, length(ov_constraints));
+u_all = cell(1, length(ov_constraints));
+t_all = cell(1, length(ov_constraints));
+
+% Loop over each OV constraint scenario
+for i = 1:length(ov_constraints)
+    % Clone the original MPC object to avoid modifying it
+    mpc_temp = mpcobj;
+
+    % Set OV constraints
+    mpc_temp.OV(1).Max = ov_constraints(i, 1);
+    mpc_temp.OV(1).Min = ov_constraints(i, 2);
+
+    % Make MPC more aggressive to increase overshoot
+    mpc_temp.Weights.ManipulatedVariablesRate = 0;
+
+    % Run simulation
+    [y, t, u] = sim(mpc_temp, steps, r);
+
+    % Store results
+    y_all{i} = y;
+    u_all{i} = u;
+    t_all{i} = t;
+end
+
+% Plotting
+figure('Color', 'k');
+
+% First subplot: Position
+ax1 = subplot(2,1,1);
+hold on;
+for i = 1:length(ov_constraints)
+    stairs(t_all{i}, y_all{i}(:,1), '-', 'Color', colors{i}, 'LineWidth', 2);
+end
+for i = 1:length(ov_constraints)
+    stairs(t_constraint, [ov_constraints(i,1) ov_constraints(i,1)], '--', 'Color', colors_constraints{i}, 'LineWidth', 2);
+end
+stairs(t_all{1}, r, 'r--', 'LineWidth', 2);  % Reference signal
+hold off;
+legend([labels, labels_constraints, {'Setpoint'}], 'TextColor', 'w', 'Color', 'k', 'EdgeColor', ...
+    [0.5 0.5 0.5], 'LineWidth', 1, 'FontSize', 10, Location='best');
+ylabel('Position (m)', 'Color', 'w', 'FontSize', 10);
+title('Position', 'Color', 'w', 'FontSize', 12);
+grid on;
+ax1.Color = 'k';
+ax1.GridColor = 'w';
+ax1.GridAlpha = 0.3;
+ax1.XColor = 'w';
+ax1.YColor = 'w';
+
+% Second subplot: Control Effort
+ax2 = subplot(2,1,2);
+hold on;
+for i = 1:length(ov_constraints)
+    stairs(t_all{i}, u_all{i}, '-', 'Color', colors{i}, 'LineWidth', 2);
+end
+hold off;
+legend(labels, 'TextColor', 'w', 'Color', 'k', 'EdgeColor', ...
+    [0.5 0.5 0.5], 'LineWidth', 1, 'FontSize', 10, Location='best');
+ylabel('Force (N)', 'Color', 'w', 'FontSize', 10);
+xlabel('Time (s)', 'Color', 'w', 'FontSize', 10);
+title('Control Effort', 'Color', 'w', 'FontSize', 12);
+grid on;
+ax2.Color = 'k';
+ax2.GridColor = 'w';
+ax2.GridAlpha = 0.3;
+ax2.XColor = 'w';
+ax2.YColor = 'w';
