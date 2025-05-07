@@ -78,6 +78,24 @@ The simulation is performed directly in MATLAB using the command `sim`, for 6 se
 
 As expected, as the control input range is reduced, the control performance is degraded. Still, the MPC always finds the optimal solution by "knowing" the limits and the system's response in advance.
 
+## Effect of Different Constraints on the Controlled Variable
+
+For this analysis, we want to test the effect of constraints on the controlled variable (the position).
+
+To make the effect more visible, the MPC controller has been modified to be more aggressive (weight on the manipulated variable rate of change = 0) and cause more overshoot.
+
+The overshoot with no constraints is up to 1.1 m. We want to test the impact of:
+
+- Position constraint: [-1.15, 1.15] m
+- Position constraint: [-1.05, 1.05] m
+- Position constraint: [-1.02, 1.02] m
+
+### Simulation Result
+
+The simulation is performed directly in MATLAB using the command `sim`, for 6 seconds, on the nominal system, with the 3 different combinations of constraints listed above.
+
+We can observe how the MPC algorithm changes its control approach to prevent the controlled variable (the position) from going above the constraint.
+
 ## Author
 This project is developed by Simone Bertoni. Learn more about my work on my personal website - [Simone Bertoni - Control Lab](https://simonebertonilab.com/).
 
