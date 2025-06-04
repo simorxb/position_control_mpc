@@ -238,7 +238,12 @@ ax2.YColor = 'w';
 
 %% Run Simulink model 
 % Run Simulink simulation
-sim('model.slx');
+Fd_step = 0;
+simIn = Simulink.SimulationInput('model');
+simIn = simIn.setVariable('Fd_step', Fd_step);
+simIn = simIn.setVariable('np', 0.0005);
+simIn = simIn.setModelParameter('StopTime', '5');
+out = sim(simIn);
 
 % Get signals from simulation
 t_z = out.logsout.get('z').Values.Time;
@@ -280,6 +285,73 @@ ax1.YColor = 'w';
 ax2 = subplot(2,1,2);
 
 stairs(t_F, F, 'g-', 'LineWidth', 2); % Control effort in white
+
+ylabel('Force (N)', 'Color', 'w', 'FontSize', 12); % Y-axis label in white
+xlabel('Time (s)', 'Color', 'w', 'FontSize', 12); % X-axis label in white
+title('Control Effort', 'Color', 'w', 'FontSize', 12); % Title in white
+grid on;
+ax2.Color = 'k';
+ax2.GridColor = 'w';
+ax2.GridAlpha = 0.3;
+ax2.XColor = 'w';
+ax2.YColor = 'w';
+
+%% Run Simulink model 
+% Run Simulink simulation with force disturbance
+Fd_step = 2;
+simIn = Simulink.SimulationInput('model');
+simIn = simIn.setVariable('Fd_step', Fd_step);
+simIn = simIn.setVariable('np', 0);
+simIn = simIn.setModelParameter('StopTime', '20');
+out = sim(simIn);
+
+% Get signals from simulation
+t_z = out.logsout.get('z').Values.Time;
+z = out.logsout.get('z').Values.Data;          % Position 
+t_z_meas = out.logsout.get('z_meas').Values.Time;
+z_meas = out.logsout.get('z_meas').Values.Data;  % Measured position
+t_cost = out.logsout.get('cost').Values.Time;
+cost = out.logsout.get('cost').Values.Data;    % Cost function value
+t_ref = out.logsout.get('ref').Values.Time;
+ref = out.logsout.get('ref').Values.Data;      % Reference signal
+t_F = out.logsout.get('F').Values.Time;
+F = out.logsout.get('F').Values.Data;          % Control force
+t_Fd = out.logsout.get('Fd').Values.Time;
+Fd = out.logsout.get('Fd').Values.Data;          % Force disturbance
+
+%% Plot (black background) - from Simulink
+% Create figure with black background
+figure('Color', 'k');
+
+% First subplot: Position
+ax1 = subplot(2,1,1);
+
+stairs(t_z, z, 'm-', 'LineWidth', 2); % Feedback in magenta
+hold on;
+stairs(t_ref, ref, 'c--', 'LineWidth', 2); % Setpoint in cyan dashed
+hold off;
+
+legend('Feedback', 'Setpoint', 'TextColor', 'w', 'Color', 'k', 'EdgeColor', ...
+    [0.5 0.5 0.5], 'LineWidth', 1, 'FontSize', 12); % Legend text in white
+ylabel('Position (m)', 'Color', 'w', 'FontSize', 12); % Y-axis label in white
+title('Position', 'Color', 'w', 'FontSize', 12); % Title in white
+grid on;
+ax1.Color = 'k';
+ax1.GridColor = 'w';
+ax1.GridAlpha = 0.3;
+ax1.XColor = 'w';
+ax1.YColor = 'w';
+
+% Second subplot: Control Effort
+ax2 = subplot(2,1,2);
+
+stairs(t_F, F, 'g-', 'LineWidth', 2); % Control effort in green
+hold on;
+stairs(t_Fd, Fd, 'r-', 'LineWidth', 2); % Force disturbance in magenta
+hold off;
+
+legend('Control effort', 'Disturbance', 'TextColor', 'w', 'Color', 'k', 'EdgeColor', ...
+    [0.5 0.5 0.5], 'LineWidth', 1, 'FontSize', 12); % Legend text in white
 
 ylabel('Force (N)', 'Color', 'w', 'FontSize', 12); % Y-axis label in white
 xlabel('Time (s)', 'Color', 'w', 'FontSize', 12); % X-axis label in white
