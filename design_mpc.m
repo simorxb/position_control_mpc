@@ -237,7 +237,7 @@ ax2.XColor = 'w';
 ax2.YColor = 'w';
 
 %% Run Simulink model 
-% Run Simulink simulation
+
 Fd_step = 0;
 simIn = Simulink.SimulationInput('model');
 simIn = simIn.setVariable('Fd_step', Fd_step);
@@ -257,7 +257,7 @@ ref = out.logsout.get('ref').Values.Data;      % Reference signal
 t_F = out.logsout.get('F').Values.Time;
 F = out.logsout.get('F').Values.Data;          % Control force
 
-%% Plot (black background) - from Simulink
+% Plot (black background) - from Simulink
 % Create figure with black background
 figure('Color', 'k');
 
@@ -296,8 +296,8 @@ ax2.GridAlpha = 0.3;
 ax2.XColor = 'w';
 ax2.YColor = 'w';
 
-%% Run Simulink model 
-% Run Simulink simulation with force disturbance
+%% Run Simulink model (with force disturbance)
+
 Fd_step = 2;
 simIn = Simulink.SimulationInput('model');
 simIn = simIn.setVariable('Fd_step', Fd_step);
@@ -319,7 +319,7 @@ F = out.logsout.get('F').Values.Data;          % Control force
 t_Fd = out.logsout.get('Fd').Values.Time;
 Fd = out.logsout.get('Fd').Values.Data;          % Force disturbance
 
-%% Plot (black background) - from Simulink
+% Plot (black background) - from Simulink
 % Create figure with black background
 figure('Color', 'k');
 
