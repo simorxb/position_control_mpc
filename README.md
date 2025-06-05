@@ -96,6 +96,18 @@ The simulation is performed directly in MATLAB using the command `sim`, for 6 se
 
 We can observe how the MPC algorithm changes its control approach to prevent the controlled variable (the position) from going above the constraint.
 
+## Running in Simulink with measurement noise
+
+For this analysis, we want to test the effect of measurement noise using Simulink.
+
+A white noise bloc, with power 0.0005 and sample time 0.1 s is added to the measurement. The code section running this simulation is marked by the comment "%% Run Simulink model" in the script `design_mpc.m`.
+
+### Simulation Result
+
+The simulation is performed in Simulink for 6 seconds, on the nominal system.
+
+We can observe that the performance is degraded, but the loop maintains its stability.
+
 ## Author
 This project is developed by Simone Bertoni. Learn more about my work on my personal website - [Simone Bertoni - Control Lab](https://simonebertonilab.com/).
 
