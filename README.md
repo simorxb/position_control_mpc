@@ -108,6 +108,22 @@ The simulation is performed in Simulink for 6 seconds, on the nominal system.
 
 We can observe that the performance is degraded, but the loop maintains its stability.
 
+## Running in Simulink with constant disturbance on the control input
+
+For this analysis, we want to test the effect of a step disturbance on the control input using Simulink.
+
+The control input experiences a 2 N step disturbance at time 5 s.
+
+### Simulation Result
+
+The simulation is performed in Simulink for 20 seconds, on the nominal system, including the mentioned disturbance.
+
+We can see that the control algorithm maintains a constant force, -2 N. This is not sufficient to bring the position back at the setpoint.
+
+This is different from a PID, which has the integral action which will keep integrating (i.e. increasing the force) until the position has been restored.
+
+The MPC instead, looks at the current state (position, speed) and predicts 10 steps ahead (prediction horizon) with 2 control moves (control horizon). We can see that if the model used by the MPC differs from the real plant (which is always the case) the MPC will never reach the right force.
+
 ## Author
 This project is developed by Simone Bertoni. Learn more about my work on my personal website - [Simone Bertoni - Control Lab](https://simonebertonilab.com/).
 
