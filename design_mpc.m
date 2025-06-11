@@ -347,10 +347,104 @@ ax2 = subplot(2,1,2);
 
 stairs(t_F, F, 'g-', 'LineWidth', 2); % Control effort in green
 hold on;
-stairs(t_Fd, Fd, 'r-', 'LineWidth', 2); % Force disturbance in magenta
+stairs(t_Fd, Fd, 'r-', 'LineWidth', 2); % Force disturbance in red
 hold off;
 
 legend('Control effort', 'Disturbance', 'TextColor', 'w', 'Color', 'k', 'EdgeColor', ...
+    [0.5 0.5 0.5], 'LineWidth', 1, 'FontSize', 12); % Legend text in white
+
+ylabel('Force (N)', 'Color', 'w', 'FontSize', 12); % Y-axis label in white
+xlabel('Time (s)', 'Color', 'w', 'FontSize', 12); % X-axis label in white
+title('Control Effort', 'Color', 'w', 'FontSize', 12); % Title in white
+grid on;
+ax2.Color = 'k';
+ax2.GridColor = 'w';
+ax2.GridAlpha = 0.3;
+ax2.XColor = 'w';
+ax2.YColor = 'w';
+
+%% State space model (with unmeasured additive input disturbance)
+A_indist = [-k/m 0; 1 0];
+B_indist = [1/m 1/m; 0 0];
+C_indist = [0 1];
+D_indist = 0;
+
+% Create state-space model (with unmeasured additive input disturbance)
+object_sys_indist = ss(A_indist, B_indist, C_indist, D_indist);
+object_sys_indist = setmpcsignals(object_sys_indist, MV = 1, UD = 2, MO = 1);
+
+%% Create MPC object
+MV_indist = struct('Min', -10, 'Max', 10, 'ScaleFactor', 10);
+OV_indist = struct('Min', -2, 'Max', 2, 'ScaleFactor', 2);
+Weights_indist = struct('MV', 0, 'MVRate', 0.1, 'OV', 1);
+Ts_indist = 0.1;
+mpcobj_indist = mpc(object_sys_indist, Ts_indist, 10, 2, Weights_indist, MV_indist, OV_indist);
+
+%% Run Simulink model (with force disturbance)
+
+% Define the configurations
+configs = {
+    struct('name', 'Without Disturbance Model', 'Fd_step', 2, 'Noise', 0, 'StopTime', '50', 'mpcobj', mpcobj, 'style', '-m');
+    struct('name', 'With Disturbance Model', 'Fd_step', 2, 'Noise', 0, 'StopTime', '50', 'mpcobj', mpcobj_indist, 'style', '-g');
+};
+
+% Initialize cell array to store results
+results = cell(length(configs), 1);
+
+% Loop over each configuration
+for s = 1:length(configs)
+    config = configs{s};
+
+    simIn = Simulink.SimulationInput('model');
+    simIn = simIn.setVariable('Fd_step', config.Fd_step);
+    simIn = simIn.setVariable('np', config.Noise);
+    simIn = simIn.setVariable('mpcobj', config.mpcobj);
+    simIn = simIn.setModelParameter('StopTime', config.StopTime);
+    out = sim(simIn);
+
+    % Store results
+    results{s} = struct(...
+        'z', out.logsout.get('z').Values, ...
+        'ref', out.logsout.get('ref').Values, ...
+        'F', out.logsout.get('F').Values, ...
+        'Fd', out.logsout.get('Fd').Values);
+
+end
+
+%% Plot (black background) - from Simulink
+% Create figure with black background
+figure('Color', 'k');
+
+% First subplot: Position
+ax1 = subplot(2,1,1);
+hold on;
+for s = 1:length(configs)
+    stairs(results{s}.z.Time, results{s}.z.Data, configs{s}.style, 'LineWidth', 2, 'DisplayName', configs{s}.name); % Feedback
+end
+stairs(results{1}.ref.Time, results{1}.ref.Data, 'c--', 'LineWidth', 2, 'DisplayName', 'Setpoint'); % Setpoint in cyan dashed
+hold off;
+
+legend('TextColor', 'w', 'Color', 'k', 'EdgeColor', ...
+    [0.5 0.5 0.5], 'LineWidth', 1, 'FontSize', 12); % Legend text in white
+ylabel('Position (m)', 'Color', 'w', 'FontSize', 12); % Y-axis label in white
+title('Position', 'Color', 'w', 'FontSize', 12); % Title in white
+grid on;
+ax1.Color = 'k';
+ax1.GridColor = 'w';
+ax1.GridAlpha = 0.3;
+ax1.XColor = 'w';
+ax1.YColor = 'w';
+
+% Second subplot: Control Effort
+ax2 = subplot(2,1,2);
+hold on;
+for s = 1:length(configs)
+    stairs(results{s}.F.Time, results{s}.F.Data, configs{s}.style, 'LineWidth', 2, 'DisplayName', configs{s}.name); % Control effort
+end
+stairs(results{1}.Fd.Time, results{1}.Fd.Data, 'r-', 'LineWidth', 2, 'DisplayName', 'Force Disturbance'); % Force disturbance in red
+hold off;
+
+legend('TextColor', 'w', 'Color', 'k', 'EdgeColor', ...
     [0.5 0.5 0.5], 'LineWidth', 1, 'FontSize', 12); % Legend text in white
 
 ylabel('Force (N)', 'Color', 'w', 'FontSize', 12); % Y-axis label in white
